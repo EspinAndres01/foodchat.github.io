@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Food Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #chat-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        #chat-log {
+            overflow-y: auto;
+            max-height: 300px;
+        }
+        .message {
+            padding: 10px;
+            border-radius: 8px;
+            width: fit-content;
+            max-width: 70%;
+        }
+        .user-message {
+            background-color: #e1f5fe;
+            align-self: flex-end;
+        }
+        .bot-message {
+            background-color: #f3e5f5;
+            align-self: flex-start;
+        }
+        #user-input-form {
+            display: flex;
+            gap: 10px;
+        }
+        #user-input {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+        }
+        #user-input::placeholder {
+            color: #999;
+        }
+        #user-input:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.1rem rgba(0, 123, 255, 0.25);
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <h1>Food Chatbot</h1>
+        <ul id="chat-log"></ul>
+        <form id="user-input-form">
+            <input type="text" id="user-input" placeholder="Escribe tu mensaje aquí" autocomplete="off">
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#user-input-form").submit(function(event) {
+                event.preventDefault();
+                var userInput = $("#user-input").val();
+                $("#chat-log").append('<li class="user-message message">' + userInput + '</li>');
+                $("#user-input").val("");
+
+                $.ajax({
+                    type: "POST",
+                    url: "/chat",
+                    data: { user_input: userInput },
+                    success: function(data) {
+                        var response = data.response;
+                        var responsesArray = response.split('\n'); // Dividir respuestas por saltos de línea
+                        var responseHtml = '<ul class="bot-messages">';
+                        responsesArray.forEach(function(item) {
+                            responseHtml += '<li class="bot-message message">' + item + '</li>';
+                        });
+                        responseHtml += '</ul>';
+
+                        $("#chat-log").append(responseHtml);
+
+                        // Scroll al final del chat
+                        var chatLog = document.getElementById("chat-log");
+                        chatLog.scrollTop = chatLog.scrollHeight;
+                    }
+                });
+            });
+        });
+    </script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyD7rAx-cRDZ3pJW3CblBZZXP1Vggag2xvA",
+          authDomain: "foodchat-d542c.firebaseapp.com",
+          projectId: "foodchat-d542c",
+          storageBucket: "foodchat-d542c.appspot.com",
+          messagingSenderId: "558068188973",
+          appId: "1:558068188973:web:70b1102fb8bc22a90eb5a4",
+          measurementId: "G-ZQ4H7G3YYL"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+      </script>
+    
+</body>
+</html>
